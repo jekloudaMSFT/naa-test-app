@@ -1,20 +1,27 @@
-import { useContext } from "react";
-import { Welcome } from "./sample/Welcome";
+import { useContext, useState } from "react";
 import { TeamsFxContext } from "./Context";
-import config from "./sample/lib/config";
 import { Button } from "@fluentui/react-components";
 import { getNAAToken } from "../getNAAToken";
 
-const showFunction = Boolean(config.apiName);
-
 export default function Tab() {
   const { themeString } = useContext(TeamsFxContext);
+  const [naaResult, setNaaResult] = useState("");
   return (
     <div
-      className={themeString === "default" ? "light" : themeString === "dark" ? "dark" : "contrast"}
+      className={
+        themeString === "default"
+          ? "light"
+          : themeString === "dark"
+          ? "dark"
+          : "contrast"
+      }
     >
-      <Welcome showFunction={showFunction} />
-      <Button onClick={() => getNAAToken()}>Nested App Auth</Button>
+      <Button
+        onClick={() => getNAAToken().then((result) => setNaaResult(result))}
+      >
+        Nested App Auth
+      </Button>
+      <div>{naaResult}</div>
     </div>
   );
 }
