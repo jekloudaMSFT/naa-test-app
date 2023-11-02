@@ -44,7 +44,7 @@ export async function ssoGetToken(): Promise<string> {
 
   if (!activeAccount) {
     console.log("No active account, trying login popup");
-    pca
+    await pca
       .loginPopup()
       .then((result) => {
         if (result) {
@@ -55,7 +55,7 @@ export async function ssoGetToken(): Promise<string> {
       })
       .catch((error) => {
         console.log(error);
-        return error;
+        return JSON.stringify(error);
       });
   }
 
@@ -81,12 +81,12 @@ export async function ssoGetToken(): Promise<string> {
         })
         .catch((error) => {
           console.log(error);
-          return error;
+          return JSON.stringify(error);
         });
     });
 }
 
-async function fetchUserFromGraph(accessToken: string) {
+async function fetchUserFromGraph(accessToken: string): Promise<string> {
   const requestString = "https://graph.microsoft.com/v1.0/me";
   const headersInit = { Authorization: accessToken };
   const requestInit = { headers: headersInit };
@@ -99,7 +99,7 @@ async function fetchUserFromGraph(accessToken: string) {
     } else {
       //Handle whatever errors could happen that have nothing to do with identity
       console.log(result);
-      return result;
+      return JSON.stringify(result);
     }
   } else {
     //throw this should never happen
