@@ -1,4 +1,5 @@
 import {
+  AccountInfo,
   IPublicClientApplication,
   PublicClientNext,
 } from "@azure/msal-browser";
@@ -13,28 +14,31 @@ const msalConfig = {
 
 let pca: IPublicClientApplication;
 
+export function initializePublicClient(): Promise<IPublicClientApplication> {
+  console.log("Starting initializePublicClient");
+  return PublicClientNext.createPublicClientApplication(msalConfig).then(
+    (result) => {
+      console.log("Client app created");
+      pca = result;
+      return pca;
+    }
+  );
+}
+
 export function getNAAToken(): Promise<string> {
-  try {
-    console.log("Starting getNAAToken");
-    return PublicClientNext.createPublicClientApplication(msalConfig)
-      .then((result) => {
-        console.log("Client app created, getting sso token");
-        pca = result;
-        return ssoGetToken();
-      })
-      .catch((error) => {
-        console.log(error);
-        return error;
-      });
-  } catch (error) {
-    console.log(error);
-    return Promise.resolve(JSON.stringify(error));
+  console.log("Starting getNAAToken");
+  if (!pca) {
+    return initializePublicClient().then((_client) => {
+      return ssoGetToken();
+    });
+  } else {
+    return ssoGetToken();
   }
 }
 
-export async function ssoGetToken(): Promise<string> {
-  let activeAccount;
-
+export async function getActiveAccount(): Promise<AccountInfo> {
+  console.log("Starting getActiveAccount");
+  let activeAccount = null;
   try {
     console.log("getting active account");
     activeAccount = pca.getActiveAccount();
@@ -53,11 +57,16 @@ export async function ssoGetToken(): Promise<string> {
           activeAccount = result.account;
         }
       })
-      .catch((error) => {
-        console.log(error);
-        return JSON.stringify(error);
-      });
   }
+  if (activeAccount) {
+    return activeAccount;
+  } else {
+    throw new Error("No active account found");
+  }
+}
+
+export async function ssoGetToken(): Promise<string> {
+  let activeAccount = await getActiveAccount();
 
   const tokenRequest = {
     scopes: ["User.Read"],
@@ -68,7 +77,7 @@ export async function ssoGetToken(): Promise<string> {
     .acquireTokenSilent(tokenRequest)
     .then((result) => {
       console.log(result);
-      return fetchUserFromGraph(result.accessToken);
+      return result.accessToken;
     })
     .catch((error) => {
       console.log(error);
@@ -77,13 +86,19 @@ export async function ssoGetToken(): Promise<string> {
         .acquireTokenPopup(tokenRequest)
         .then(async (result) => {
           console.log(result);
-          return fetchUserFromGraph(result.accessToken);
+          return result.accessToken;
         })
         .catch((error) => {
           console.log(error);
           return JSON.stringify(error);
         });
     });
+}
+
+export async function ssoGetTokenAndFetchUser(): Promise<string> {
+  return ssoGetToken().then((token) => {
+    return fetchUserFromGraph(token);
+  });
 }
 
 async function fetchUserFromGraph(accessToken: string): Promise<string> {

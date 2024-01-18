@@ -1,11 +1,10 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { TeamsFxContext } from "./Context";
-import { Button } from "@fluentui/react-components";
-import { getNAAToken } from "../getNAAToken";
+import { getActiveAccount, getNAAToken, initializePublicClient, ssoGetTokenAndFetchUser } from "../getNAAToken";
+import ApiControl from "./ApiControl";
 
 export default function Tab() {
   const { themeString } = useContext(TeamsFxContext);
-  const [naaResult, setNaaResult] = useState("");
   return (
     <div
       className={
@@ -16,12 +15,24 @@ export default function Tab() {
           : "contrast"
       }
     >
-      <Button
-        onClick={() => getNAAToken().then((result) => setNaaResult(result))}
-      >
-        Nested App Auth
-      </Button>
-      <div>{naaResult}</div>
+      <div className="api-container">
+        <ApiControl
+          apiName="Initialize public client application"
+          onClick={async () => JSON.stringify(await initializePublicClient())}
+        />
+        <ApiControl
+          apiName="Get auth token"
+          onClick={async () => await getNAAToken()}
+        />
+        <ApiControl
+          apiName="Get active account"
+          onClick={async () => JSON.stringify(await getActiveAccount())}
+        />
+        <ApiControl
+          apiName="Get user info from Graph"
+          onClick={async () => await ssoGetTokenAndFetchUser()}
+        />
+      </div>
     </div>
   );
 }

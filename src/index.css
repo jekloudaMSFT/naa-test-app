@@ -11,6 +11,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.api-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.api-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.api-control > * {
+  margin: 0.5rem;
+}
+
+.api-control > .result {
+  height: 15rem;
+  width: 20rem;
+  text-wrap: wrap;
+}
+
 @media only screen and (max-width: 768px) {
   body {
     width: fit-content;
