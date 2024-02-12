@@ -13,7 +13,7 @@ body {
 
 .api-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .api-control {
@@ -29,7 +29,7 @@ body {
 
 .api-control > .result {
   height: 15rem;
-  width: 20rem;
+  width: 30rem;
   text-wrap: wrap;
 }
 
