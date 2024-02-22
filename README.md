@@ -1,10 +1,9 @@
-# Overview of the React with Fluent UI template
+# Nested App Auth Test App
 
-This app showcases how to craft a visually appealing web page that can be embedded in Microsoft Teams, Outlook and the Microsoft 365 app with React and Fluent UI. The app also enhances the end-user experiences with built-in single sign-on and data from Microsoft Graph.
+This is a [TeamsJS](https://github.com/OfficeDev/microsoft-teams-library-js) app designed to test nested app authentication (NAA) in app hosts.
 
-This app has adopted [On-Behalf-Of flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow) to implement SSO, and uses Azure Function as middle-tier service, and make authenticated requests to call Graph from Azure Function.
 
-## Get started with the React with Fluent UI template
+## How to run this app locally
 
 > **Prerequisites**
 >
@@ -20,12 +19,23 @@ This app has adopted [On-Behalf-Of flow](https://learn.microsoft.com/en-us/azure
 2. In the Account section, sign in with your [Microsoft 365 account](https://docs.microsoft.com/microsoftteams/platform/toolkit/accounts) if you haven't already.
 3. Press F5 to start debugging which launches your app in Teams using a web browser. Select `Debug (Edge)` or `Debug (Chrome)`.
 4. When Teams launches in the browser, select the Add button in the dialog to install your app to Teams.
+5. To sideload your app on a host not included in the Teams Toolkit configurations, find the compiled manifest package under appPackage > build > appPackage.local.zip.
 
-**Congratulations**! You are running an application that can now show a beautiful web page in Teams, Outlook and the Microsoft 365 app.
+## Configuring NAA for deployment
 
-![Personal tab demo](https://user-images.githubusercontent.com/11220663/167839153-0aef6adc-450e-4b8c-a28f-7d27005d1093.png)
+If you plan on deploying this app to the web, you will need to create a new AAD app registration and configure it for NAA with your web URL.
 
-## What's included in the template
+1. Go to [Azure Portal](https://ms.portal.azure.com)
+2. Navigate to Microsoft Entra ID and find your app registrations in the left nav bar.
+3. Create a new registration by clicking the "New registration" button at the top of the page.
+4. Provide a name for your registration and select the supported account type.
+5. Under the Redirect URI heading, select "Single-page application" and provide "brk-multihub://<YOUR_WEB_APP_DOMAIN_HERE>" as the URI value.
+6. Select register and note the application client ID.
+7. In the naa-test-app repo, navigate to src/AuthModule.ts and replace the client ID in `msalConfig` with your AAD client ID.
+
+## Additional Teams Toolkit Template info
+
+### What's included in the template
 
 | Folder       | Contents                                            |
 | - | - |
@@ -43,7 +53,7 @@ The following are Teams Toolkit specific project files. You can [visit a complet
 |`teamsapp.local.yml`|This overrides `teamsapp.yml` with actions that enable local execution and debugging.|
 |`aad.manifest.json`|This file defines the configuration of Azure Active Directory app. This template will only provision [single tenant](https://learn.microsoft.com/azure/active-directory/develop/single-and-multi-tenant-apps#who-can-sign-in-to-your-app) Azure Active Directory app.|
 
-## Extend the React with Fluent UI template
+### Extend the React with Fluent UI template
 
 Following documentation will help you to extend the React with Fluent UI template.
 
