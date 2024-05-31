@@ -1,14 +1,13 @@
 import {
   AccountInfo,
   IPublicClientApplication,
-  PublicClientNext,
+  createNestablePublicClientApplication,
 } from "@azure/msal-browser";
 
 const msalConfig = {
   auth: {
     clientId: "bc4e0fa1-0903-4c5a-95e3-6587b1a21301",
     authority: "https://login.microsoftonline.com/common",
-    supportsNestedAppAuth: true,
   },
 };
 
@@ -16,7 +15,7 @@ let pca: IPublicClientApplication;
 
 export function initializePublicClient(): Promise<IPublicClientApplication> {
   console.log("Starting initializePublicClient");
-  return PublicClientNext.createPublicClientApplication(msalConfig).then(
+  return createNestablePublicClientApplication(msalConfig).then(
     (result) => {
       console.log("Client app created");
       pca = result;
@@ -29,10 +28,10 @@ export function getNAAToken(): Promise<string> {
   console.log("Starting getNAAToken");
   if (!pca) {
     return initializePublicClient().then((_client) => {
-      return ssoGetToken();
+      return getToken();
     });
   } else {
-    return ssoGetToken();
+    return getToken();
   }
 }
 
@@ -63,7 +62,7 @@ export async function getActiveAccount(): Promise<AccountInfo | null> {
   return activeAccount;
 }
 
-export async function ssoGetToken(): Promise<string> {
+export async function getToken(): Promise<string> {
   let activeAccount = await getActiveAccount();
 
   const tokenRequest = {
@@ -93,8 +92,8 @@ export async function ssoGetToken(): Promise<string> {
     });
 }
 
-export async function ssoGetTokenAndFetchUser(): Promise<string> {
-  return ssoGetToken().then((token) => {
+export async function getTokenAndFetchUser(): Promise<string> {
+  return getToken().then((token) => {
     return fetchUserFromGraph(token);
   });
 }

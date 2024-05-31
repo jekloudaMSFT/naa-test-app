@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { TeamsFxContext } from "./Context";
-import { getActiveAccount, getNAAToken, initializePublicClient, ssoGetTokenAndFetchUser } from "../getNAAToken";
+import { getActiveAccount, getNAAToken, initializePublicClient, getTokenAndFetchUser } from "../getNAAToken";
 import ApiControl from "./ApiControl";
 
 export default function Tab() {
@@ -15,6 +15,7 @@ export default function Tab() {
           : "contrast"
       }
     >
+      <div>2024053101</div>
       <div className="api-container">
         <ApiControl
           apiName="Initialize public client application"
@@ -30,7 +31,7 @@ export default function Tab() {
         />
         <ApiControl
           apiName="Get user info from Graph"
-          onClick={async () => await ssoGetTokenAndFetchUser()}
+          onClick={async () => await getTokenAndFetchUser()}
         />
       </div>
     </div>
