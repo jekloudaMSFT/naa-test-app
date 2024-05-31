@@ -36,7 +36,7 @@ export function getNAAToken(): Promise<string> {
   }
 }
 
-export async function getActiveAccount(): Promise<AccountInfo> {
+export async function getActiveAccount(): Promise<AccountInfo | null> {
   console.log("Starting getActiveAccount");
   let activeAccount = null;
   try {
@@ -48,21 +48,19 @@ export async function getActiveAccount(): Promise<AccountInfo> {
 
   if (!activeAccount) {
     console.log("No active account, trying login popup");
-    await pca
-      .loginPopup()
-      .then((result) => {
+    try {
+      await pca.loginPopup().then((result) => {
         if (result) {
           result.account && pca.setActiveAccount(result.account);
           console.log(result);
           activeAccount = result.account;
         }
-      })
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
-  if (activeAccount) {
-    return activeAccount;
-  } else {
-    throw new Error("No active account found");
-  }
+  return activeAccount;
 }
 
 export async function ssoGetToken(): Promise<string> {
