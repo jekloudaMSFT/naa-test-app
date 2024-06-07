@@ -1,13 +1,38 @@
 import {
   AccountInfo,
+  Configuration,
   IPublicClientApplication,
+  LogLevel,
   createNestablePublicClientApplication,
 } from "@azure/msal-browser";
+import { app } from "@microsoft/teams-js";
 
-const msalConfig = {
+const msalConfig: Configuration = {
   auth: {
     clientId: "bc4e0fa1-0903-4c5a-95e3-6587b1a21301",
     authority: "https://login.microsoftonline.com/common",
+  },
+  system: {
+    loggerOptions: {
+      logLevel: LogLevel.Verbose,
+      loggerCallback: (level, message, containsPii) => {
+        switch (level) {
+          case 0:
+            console.error(message);
+            return;
+          case 1:
+            console.warn(message);
+            return;
+          case 2:
+            console.info(message);
+            return;
+          case 3:
+            console.log(message);
+            return;
+        }
+      },
+      piiLoggingEnabled: true
+    },
   },
 };
 
@@ -48,13 +73,17 @@ export async function getActiveAccount(): Promise<AccountInfo | null> {
   if (!activeAccount) {
     console.log("No active account, trying login popup");
     try {
-      await pca.loginPopup().then((result) => {
-        if (result) {
-          result.account && pca.setActiveAccount(result.account);
-          console.log(result);
-          activeAccount = result.account;
-        }
-      });
+      const context = await app.getContext();
+      const accountFilter = {
+        tenantId: context.user?.tenant?.id,
+        homeAccountId: context.user?.id,
+        loginHint: (await app.getContext()).user?.loginHint
+      };
+      const accountWithFilter = pca.getAccount(accountFilter);
+      if (accountWithFilter) {
+        activeAccount = accountWithFilter;
+        pca.setActiveAccount(activeAccount);
+      }
     } catch (error) {
       console.log(error);
     }

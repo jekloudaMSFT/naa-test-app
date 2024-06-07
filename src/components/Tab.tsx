@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { TeamsFxContext } from "./Context";
 import { getActiveAccount, getNAAToken, initializePublicClient, getTokenAndFetchUser } from "../getNAAToken";
 import ApiControl from "./ApiControl";
+import { nestedAppAuth } from "@microsoft/teams-js";
 
 export default function Tab() {
   const { themeString } = useContext(TeamsFxContext);
@@ -15,8 +16,12 @@ export default function Tab() {
           : "contrast"
       }
     >
-      <div>2024053101</div>
+      <div>2024060501</div>
       <div className="api-container">
+        <ApiControl
+          apiName="isNAAChannelRecommended"
+          onClick={async () => JSON.stringify(await nestedAppAuth.isNAAChannelRecommended())}
+        />
         <ApiControl
           apiName="Initialize public client application"
           onClick={async () => JSON.stringify(await initializePublicClient())}
